@@ -1,7 +1,7 @@
 import React from "react";
-import Img from "../../assets/register/register.png";
 
-function RegisterRight() {
+
+function RegisterRight({Img}) {
   return (
     <>
       <div className="w-[50%]">
