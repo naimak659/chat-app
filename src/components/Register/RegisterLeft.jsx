@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import RegisterInput from "./RegisterInput";
 import { emailValidation } from "../../Utils/validation";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { SuccesfullToast, ErrorToast, InfoToast } from "../../Utils/toast";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+} from "firebase/auth";
 import appDB from "../../FirebaseConfig/FireBaseDBConnection";
-import { toast, Bounce } from "react-toastify";
+
 import { HashLoader } from "react-spinners";
 
 function RegisterLeft() {
@@ -59,27 +65,39 @@ function RegisterLeft() {
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           console.log(userCredential);
-          toast(`${fullname} Registration Done`, {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-          });
+          SuccesfullToast(`${fullname} Registration done!`);
+        })
+        .then(() => {
+          sendEmailVerification(auth.currentUser)
+            .then(() => {
+              InfoToast("Check your email");
+            })
+            .then(() => {
+              updateProfile(auth.currentUser, {
+                displayName: fullname,
+              });
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         })
         .catch((err) => {
           console.log(err);
+          const error = err.message || err;
+          const regex = /auth\/(.*?)(?=\))/;
+          const match = error.match(regex);
+          const extractedError = match ? match[1] : "null";
+          ErrorToast(extractedError.replace(/-/g, " "));
         })
         .finally(() => {
           setLoading(false);
+          setFullname("");
+          setEmail("");
+          setPassword("");
         });
     }
   };
-
+  console.log(auth.currentUser);
   return (
     <>
       <div className="flex flex-col items-center justify-center w-[60%] h-full ">
