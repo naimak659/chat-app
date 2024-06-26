@@ -2,13 +2,19 @@ import React, { useState } from "react";
 
 import { HashLoader } from "react-spinners";
 import { emailValidation } from "../../Utils/validation";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { ErrorToast, SuccesfullToast } from "../../Utils/toast";
+import { LuEye, LuEyeOff } from "react-icons/lu";
+import { Link } from "react-router-dom";
 
 function LoginLeft() {
   const [userInfo, setUserInfo] = useState({
     email: "",
     password: "",
   });
-  const [err, serErr] = useState({
+  const [eyeOpen, setEyeOpen] = useState(false);
+  // error handling using object state
+  const [err, setErr] = useState({
     emailError: "",
     passwordError: "",
   });
@@ -16,13 +22,19 @@ function LoginLeft() {
   const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const auth = getAuth();
+
   // todo: handle the input chage and set the state
   const handleOnChange = (e) => {
     setUserInfo({
       ...userInfo,
       [e.target.id]: e.target.value,
     });
-    console.log(userInfo);
+  };
+
+  const showPassword = (e) => {
+    e.preventDefault();
+    setEyeOpen((eye) => !eye);
   };
 
   // todo: prevent the defult behevior of form.
@@ -30,19 +42,34 @@ function LoginLeft() {
     e.preventDefault();
 
     if (!email) {
-      setErr({
-        ...userInfo,
-        [e.target.id]: e.target.value,
-      });
       setEmailError("Email required");
-    } else if (!emailValidation(email)) {
+    } else if (emailValidation(email)) {
       setEmailError("Email is not valid");
     } else if (!password) {
       setEmailError("");
       setPasswordError("Password required");
     } else {
       setPasswordError("");
-      // setLoading(true);
+      setLoading(true);
+      signInWithEmailAndPassword(auth, userInfo.email, userInfo.password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          SuccesfullToast("logged in");
+          console.log(user);
+        })
+        .catch((err) => {
+          const errorCode = err.code;
+          const errorMessage = err.message;
+          ErrorToast(errorCode);
+          console.log(errorCode);
+          console.log(errorMessage);
+          ErrorToast(errorMessage);
+        })
+        .finally(() => {
+          setLoading(false);
+          setEmailError("");
+          setPasswordError("");
+        });
     }
   };
   return (
@@ -56,6 +83,17 @@ function LoginLeft() {
           </div>
 
           <form action="">
+            <div class="flex mb-5">
+              <button class="px-4 py-2 border flex gap-2 border-slate-200  rounded-lg text-slate-700  hover:border-slate-400 hover:text-slate-900  hover:shadow transition duration-150">
+                <img
+                  class="w-6 h-6"
+                  src="https://www.svgrepo.com/show/475656/google-color.svg"
+                  loading="lazy"
+                  alt="google logo"
+                />
+                <span>Login with Google</span>
+              </button>
+            </div>
             <div className="flex flex-col gap-12">
               <div className="flex flex-col gap-2">
                 <label
@@ -82,13 +120,22 @@ function LoginLeft() {
                 >
                   Password
                 </label>
-                <input
-                  className="py-3 focus-within:outline-none border-b-[1px] border-cs-gray/20 w-[368px] px-1 font-semibold text-xl text-cs-blue placeholder:text-cs-blue/50"
-                  type="password"
-                  id="password"
-                  onChange={handleOnChange}
-                  placeholder="YourAddress@email.com"
-                />
+                <div className="relative">
+                  <input
+                    className="py-3 focus-within:outline-none border-b-[1px] border-cs-gray/20 w-[368px] px-1 font-semibold text-xl text-cs-blue placeholder:text-cs-blue/50"
+                    type={eyeOpen ? "text" : "password"}
+                    id="password"
+                    onChange={handleOnChange}
+                    placeholder="YourAddress@email.com"
+                  />
+                  <button
+                    className="text-2xl text-cs-gray/50 absolute right-3 top-1/2 -translate-y-1/2"
+                    onClick={(e) => showPassword(e)}
+                  >
+                    {eyeOpen ? <LuEyeOff /> : <LuEye />}
+                  </button>
+                </div>
+
                 <p className="text-warning font-medium text-sm mt-1 font-openSans">
                   {passwordError}
                 </p>
@@ -103,12 +150,15 @@ function LoginLeft() {
                 {loading ? <HashLoader color="#fff" size={36} /> : "Sign Up"}
               </button>
 
-              <p className="text-cs-deepBlue font-openSans ">
-                Already have an account ?{"  "}
+              <Link
+                to="/registration"
+                className="text-cs-deepBlue font-openSans "
+              >
+                Don’t have an account ?{"  "}
                 <span className="text-warning font-bold  text-center cursor-pointer">
-                  Sign In
+                  Sign up
                 </span>
-              </p>
+              </Link>
             </div>
           </form>
         </div>

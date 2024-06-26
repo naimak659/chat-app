@@ -11,6 +11,7 @@ import {
 import appDB from "../../FirebaseConfig/FireBaseDBConnection";
 
 import { HashLoader } from "react-spinners";
+import { Link } from "react-router-dom";
 
 function RegisterLeft() {
   const [email, setEmail] = useState("");
@@ -153,12 +154,12 @@ function RegisterLeft() {
                 {loading ? <HashLoader color="#fff" size={36} /> : "Sign Up"}
               </button>
 
-              <p className="text-cs-deepBlue font-openSans ">
+              <Link to="/login" className="text-cs-deepBlue font-openSans ">
                 Already have an account ?{"  "}
                 <span className="text-warning font-bold  text-center cursor-pointer">
                   Sign In
                 </span>
-              </p>
+              </Link>
             </div>
           </form>
         </div>
