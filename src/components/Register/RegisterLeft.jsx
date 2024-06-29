@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import RegisterInput from "./RegisterInput";
 import { emailValidation } from "../../Utils/validation";
 import { SuccesfullToast, ErrorToast, InfoToast } from "../../Utils/toast";
+import { getDatabase, push, ref, set } from "firebase/database";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -11,7 +12,8 @@ import {
 import appDB from "../../FirebaseConfig/FireBaseDBConnection";
 
 import { HashLoader } from "react-spinners";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { GetTimeNow } from "../../Utils/moment";
 
 function RegisterLeft() {
   const [email, setEmail] = useState("");
@@ -26,6 +28,8 @@ function RegisterLeft() {
   const [passwordError, setPasswordError] = useState("");
   // fire base sign up
   const auth = getAuth(appDB);
+  const db = getDatabase();
+  const navigate = useNavigate();
 
   // handling input's on change
   const handleEmail = (e) => {
@@ -82,6 +86,22 @@ function RegisterLeft() {
               console.log(err);
             });
         })
+        .then(() => {
+          const usersRef = ref(db, "users");
+          set(push(usersRef), {
+            uid: auth.currentUser.uid,
+            username: fullname,
+            userEmail: auth.currentUser.email,
+            createdAt: GetTimeNow(),
+          })
+            .then(() => {
+              console.log("Your data saved");
+              SuccesfullToast("Your data saved");
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        })
         .catch((err) => {
           console.log(err);
           const error = err.message || err;
@@ -98,7 +118,7 @@ function RegisterLeft() {
         });
     }
   };
-  console.log(auth.currentUser);
+  
   return (
     <>
       <div className="flex flex-col items-center justify-center w-[60%] h-full ">
