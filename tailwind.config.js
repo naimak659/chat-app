@@ -13,8 +13,9 @@ export default {
       fontFamily: {
         nunito: ["Nunito", "sans-serif"],
         openSans: ["Open Sans", "sans-serif"],
+        poppins: ["Poppins", "sans-serif"],
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwind-scrollbar")],
 };

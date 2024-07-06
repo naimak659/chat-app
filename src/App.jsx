@@ -8,6 +8,7 @@ import {
   Route,
   RouterProvider,
 } from "react-router-dom";
+import Home from "./pages/Home/Home.jsx";
 
 function App() {
   const router = createBrowserRouter(
@@ -15,6 +16,7 @@ function App() {
       <Route path="/">
         <Route path="/registration" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Home />} />
       </Route>
     )
   );

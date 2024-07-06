@@ -97,6 +97,7 @@ function RegisterLeft() {
             .then(() => {
               console.log("Your data saved");
               SuccesfullToast("Your data saved");
+              navigate("/login");
             })
             .catch((err) => {
               console.log(err);
@@ -118,7 +119,7 @@ function RegisterLeft() {
         });
     }
   };
-  
+
   return (
     <>
       <div className="flex flex-col items-center justify-center w-[60%] h-full ">
