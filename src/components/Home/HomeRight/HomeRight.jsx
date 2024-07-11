@@ -4,7 +4,7 @@ import Group from "../HomeComeponents/GroupList/Group";
 
 function HomeRight() {
   return (
-    <div className="grid grid-cols-3 gap-6 ">
+    <div className="grid grid-cols-3 gap-6 w-full">
       <div className="flex flex-col gap-2">
         <Search />
         <Group />

@@ -21,7 +21,7 @@ function Group() {
   }, []);
 
   return (
-    <div className="shadow-lg py-4 px-5 rounded-lg w-[447px] scrollbar-thumb-cs-purple/80 scrollbar-track-cs-purple/40 scrollbar-thumb-r font-poppins">
+    <div className="shadow-lg py-4 px-5 rounded-lg w-full min-w-[477px] scrollbar-thumb-cs-purple/80 scrollbar-track-cs-purple/40 scrollbar-thumb-r font-poppins">
       <div className="flex justify-between mb-4">
         <p className="text-xl font-semibold ">Group List</p>
         <IoMdMore className="text-xl text-cs-purple" />

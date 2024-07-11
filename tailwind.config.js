@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+import animations from "@midudev/tailwind-animations";
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -15,7 +16,10 @@ export default {
         openSans: ["Open Sans", "sans-serif"],
         poppins: ["Poppins", "sans-serif"],
       },
+      animation: {
+        jiggle: "jiggle .6s  infinite",
+      },
     },
   },
-  plugins: [require("tailwind-scrollbar")],
+  plugins: [require("tailwind-scrollbar"), animations],
 };
