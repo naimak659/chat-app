@@ -18,6 +18,7 @@ export default {
       },
       animation: {
         jiggle: "jiggle .6s  infinite",
+        scale: "scale .2s infinite",
       },
     },
   },

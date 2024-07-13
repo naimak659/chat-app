@@ -10,7 +10,8 @@ function Group() {
       const imageImports = [];
       for (let index = 0; index < 17; index++) {
         const img = await import(
-          `../../../../assets/ProfilePic/Asset ${index + 2}.webp`
+          // `../../../../assets/ProfilePic/Asset ${index + 2}.webp`
+          `../../../../assets/ProfilePic/Asset 2.webp`
         );
         imageImports.push(img.default);
       }
@@ -27,10 +28,10 @@ function Group() {
         <IoMdMore className="text-xl text-cs-purple" />
       </div>
       <div className="overflow-y-scroll scrollbar-thumb-rounded-full scrollbar-thin max-h-[312px] px-2 ">
-        {imgs.map((item) => {
+        {imgs.map((item, i) => {
           return (
             <>
-              <div className="flex  mb-3 justify-between items-center">
+              <div className="flex  mb-3 justify-between items-center" key={i}>
                 <div className="flex items-center gap-4">
                   <picture>
                     <img
@@ -55,7 +56,7 @@ function Group() {
                   </button>
                 </div>
               </div>
-              <hr  className="mb-2"/>
+              <hr className="mb-2" key={i + 20} />
             </>
           );
         })}

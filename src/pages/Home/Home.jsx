@@ -1,13 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import NavigationBar from "../../components/Home/NavigationBar";
 import { Outlet } from "react-router-dom";
+import HomeRight from "../../components/Home/HomeRight/HomeRight";
 
 function Home() {
   return (
-    <div className="px-8 py-9 h-screen flex gap-4 ">
-      <NavigationBar />
-      <Outlet />
-    </div>
+    <>
+      <HomeRight />
+    </>
   );
 }
 

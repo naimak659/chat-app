@@ -91,6 +91,7 @@ function RegisterLeft() {
           set(push(usersRef), {
             uid: auth.currentUser.uid,
             username: fullname,
+            userProfilePic: "",
             userEmail: auth.currentUser.email,
             createdAt: GetTimeNow(),
           })

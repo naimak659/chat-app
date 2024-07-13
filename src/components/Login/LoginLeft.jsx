@@ -11,8 +11,11 @@ import {
 } from "firebase/auth";
 import { ErrorToast, SuccesfullToast } from "../../Utils/toast";
 import { LuEye, LuEyeOff } from "react-icons/lu";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import { getDatabase, push, set } from "firebase/database";
+import { GetTimeNow } from "../../Utils/moment";
+import appDB from "../../FirebaseConfig/FireBaseDBConnection";
 
 function LoginLeft() {
   const [userInfo, setUserInfo] = useState({
@@ -27,8 +30,10 @@ function LoginLeft() {
   });
 
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const auth = getAuth();
+  const auth = getAuth(appDB);
+  const db = getDatabase();
 
   // todo: handle the input chage and set the state
   const handleOnChange = (e) => {
@@ -75,6 +80,9 @@ function LoginLeft() {
           SuccesfullToast("logged in");
           console.log(user);
         })
+        .then(() => {
+          navigate("/");
+        })
         .catch((err) => {
           const errorCode = err.code;
           const errorMessage = err.message;
@@ -103,8 +111,23 @@ function LoginLeft() {
           const credential = GoogleAuthProvider.credentialFromResult(result);
           const token = credential.accessToken;
           const user = result.user;
-          console.log(user);
           SuccesfullToast("Logged in with Google");
+          return user;
+        })
+        .then((user) => {
+          const { photoUrl, localId, email, displayName } = user.reloadUserInfo;
+          // console.log(user);
+          const usersRef = ref(db, "users");
+          set(
+            push(usersRef, {
+              uid: localId,
+              username: displayName,
+              userProfilePic: photoUrl,
+              userEmail: email,
+              createdAt: GetTimeNow(),
+            })
+          );
+          navigate("/");
         })
         .catch((error) => {
           // Handle Errors here.
@@ -116,8 +139,6 @@ function LoginLeft() {
       console.log(error);
     }
   };
-
-
 
   return (
     <>
