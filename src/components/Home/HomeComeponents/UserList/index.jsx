@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
+  equalTo,
+  get,
   getDatabase,
   onValue,
+  orderByChild,
   push,
+  query,
   ref,
   remove,
   set,
@@ -22,20 +26,19 @@ function UserList() {
   const [friendReqList, setFriendReqList] = useState([]);
 
   const handleFriendReq = (user) => {
-    // console.log(user);
     const friendReqDbRef = ref(db, "friendreq/");
-
-    // console.log(auth.currentUser);
 
     set(push(friendReqDbRef), {
       sender_uid: auth.currentUser.uid,
       // sender_userKey: auth.currentUser.userKey,
       sender_email: auth.currentUser.email,
-      sender_userProfilePic: auth.currentUser.userProfilePic
-        ? auth.currentUser.userProfilePic
+      sender_name: auth.currentUser.displayName,
+      sender_userProfilePic: auth.currentUser.photoURL
+        ? auth.currentUser.photoURL
         : null,
       receiver_uid: user.uid,
-      receiver_email: user.userEmail,
+      receiver_email: user.email,
+      receiver_name: user.username,
       receiver_userKey: user.userKey,
       receiver_userProfilePic: user.userProfilePic,
       createdAt: GetTimeNow(),
@@ -50,7 +53,7 @@ function UserList() {
    */
 
   const handleCancleFriendReq = (item) => {
-    console.log(item.reqKey);
+    // console.log(item.reqKey);
     const friendReqDbRef = ref(db, "friendreq/" + item.reqKey);
     remove(friendReqDbRef);
   };
@@ -60,20 +63,25 @@ function UserList() {
   get all friend request from fireBase
   */
   useEffect(() => {
-    const friendReqDBRef = ref(db, "friendreq/");
+    const friendReqDBQuery = query(
+      ref(db, "friendreq/"),
+      orderByChild("sender_uid"),
+      equalTo(auth.currentUser.uid)
+    );
 
-    onValue(friendReqDBRef, (snapshot) => {
-      let userBlankArr = [];
-      snapshot.forEach((item) => {
-        userBlankArr.push({
-          ...item.val(),
-          reqKey: item.key,
-          friendReqUid: item.val().receiver_uid + item.val().sender_uid,
-        });
+    onValue(friendReqDBQuery, (snapShot) => {
+      let friendReqList = [];
+      snapShot.forEach((item) => {
+        friendReqList.push({ ...item.val(), reqKey: item.key });
       });
-      setFriendReqList(userBlankArr);
+      setFriendReqList(friendReqList);
     });
-  }, []);
+    return () => {
+      setFriendReqList([]);
+    };
+  }, [db, auth.currentUser.uid]);
+
+  console.log("friendReqList user", friendReqList.length, friendReqList);
 
   /**
    * todo: get all users from firebase
@@ -94,12 +102,19 @@ function UserList() {
     });
     // console.log(auth.currentUser);
   }, []);
-  console.log(friendReqList);
 
   return (
     <div className="shadow-lg py-4 px-5 rounded-lg 2xl:w-full  scrollbar-thumb-cs-purple/80 scrollbar-track-cs-purple/40 scrollbar-thumb-r font-poppins">
       <div className="flex justify-between mb-4">
-        <p className="text-xl font-semibold ">User List</p>
+        <p className="text-xl font-semibold relative">
+          <span>User List</span>
+          <span className="absolute -top-1 -right-[16px] flex h-4 w-4">
+            <span className="animate-ping animate-infinite animate-duration-1000 animate-ease-in-out absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-4 w-4 bg-sky-500 text-xs text-white justify-center items-center ">
+              {users.length}
+            </span>
+          </span>
+        </p>
         <IoMdMore className="text-xl text-cs-purple" />
       </div>
       <div className="overflow-y-scroll scrollbar-thumb-rounded-full scrollbar-thin max-h-[312px] px-2 ">
@@ -125,19 +140,6 @@ function UserList() {
                   </div>
                 </div>
                 <div>
-                  {/* {friendReqList.map((req) => {
-                    return req.receiver_uid === auth.currentUser.uid ? (
-                      <button
-                        key={req.reqKey}
-                        className="bg-cs-purple 2xl:px-5 2xl:py-2 rounded-xl text-white 2xl:text-lg font-semibold font-poppins text-sm px-3 py-1 mr-2"
-                      >
-                        <IoPersonAddOutline />
-                      </button>
-                    ) : (
-                      ""
-                    );
-                  })} */}
-
                   {friendReqList.some(
                     (req) =>
                       req.receiver_uid === item.uid &&

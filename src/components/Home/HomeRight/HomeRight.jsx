@@ -2,6 +2,7 @@ import React from "react";
 import Search from "../HomeComeponents/Search";
 import Group from "../HomeComeponents/GroupList/Group";
 import UserList from "../HomeComeponents/UserList/index.jsx";
+import FriendReq from "../HomeComeponents/FriendReq/FriendReq.jsx";
 
 function HomeRight() {
   return (
@@ -10,6 +11,7 @@ function HomeRight() {
         <Search />
         {/* <Group /> */}
         <UserList />
+        <FriendReq />
       </div>
       {/* <div className="flex flex-col gap-2">
         <Group />
