@@ -13,7 +13,7 @@ import { ErrorToast, SuccesfullToast } from "../../Utils/toast";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
-import { getDatabase, push, set } from "firebase/database";
+import { getDatabase, push, ref, set } from "firebase/database";
 import { GetTimeNow } from "../../Utils/moment";
 import appDB from "../../FirebaseConfig/FireBaseDBConnection";
 
@@ -80,6 +80,21 @@ function LoginLeft() {
           SuccesfullToast("logged in");
           console.log(user);
         })
+        // .then((user) => {
+        //   const { photoUrl, localId, email, displayName } = user.reloadUserInfo;
+        //   // console.log(user);
+        //   const usersRef = ref(db, "users");
+        //   set(
+        //     push(usersRef, {
+        //       uid: localId,
+        //       username: user,
+        //       userProfilePic: photoUrl,
+        //       userEmail: email,
+        //       createdAt: GetTimeNow(),
+        //     })
+        //   );
+        //   navigate("/");
+        // })
         .then(() => {
           navigate("/");
         })
@@ -115,25 +130,24 @@ function LoginLeft() {
           return user;
         })
         .then((user) => {
+          console.log(user);
           const { photoUrl, localId, email, displayName } = user.reloadUserInfo;
           // console.log(user);
           const usersRef = ref(db, "users");
-          set(
-            push(usersRef, {
-              uid: localId,
-              username: displayName,
-              userProfilePic: photoUrl,
-              userEmail: email,
-              createdAt: GetTimeNow(),
-            })
-          );
+          set(push(usersRef), {
+            uid: localId,
+            username: displayName,
+            userProfilePic: photoUrl,
+            userEmail: email,
+            createdAt: GetTimeNow(),
+          });
           navigate("/");
         })
         .catch((error) => {
           // Handle Errors here.
-          const errorCode = error.code;
+          const errorCode = error;
           ErrorToast(errorCode);
-          console.log(errorCode);
+          console.log(error.message);
         });
     } catch (error) {
       console.log(error);

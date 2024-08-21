@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import NavigationBar from "../../components/Home/NavigationBar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import appDB from "../../FirebaseConfig/FireBaseDBConnection";
 import NotVarified from "../../components/Home/HomeComeponents/NotVarified";
@@ -10,12 +10,16 @@ function NavigationSideBar() {
   const [isverified, setIsVarified] = useState({
     email: "",
     name: "",
-    emailVerified: true,
+    emailVerified: false,
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      // console.log(user);
+      if (!user) {
+        navigate("/login");
+      }
       setIsVarified({
         ...isverified,
         email: user.reloadUserInfo.email,
@@ -24,6 +28,7 @@ function NavigationSideBar() {
       });
     });
   }, []);
+
   console.log(isverified);
 
   return (

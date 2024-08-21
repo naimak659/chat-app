@@ -13,7 +13,7 @@ function Group() {
           // `../../../../assets/ProfilePic/Asset ${index + 2}.webp`
           `../../../../assets/ProfilePic/Asset 2.webp`
         );
-        imageImports.push(img.default);
+        imageImports.push(img);
       }
       setImgs(imageImports);
     };
