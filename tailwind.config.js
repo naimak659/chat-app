@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 import animations from "@midudev/tailwind-animations";
+
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -22,5 +23,9 @@ export default {
       },
     },
   },
-  plugins: [require("tailwind-scrollbar"), animations],
+  plugins: [
+    require("tailwindcss-animated"),
+    require("tailwind-scrollbar"),
+    // animations,
+  ],
 };
