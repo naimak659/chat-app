@@ -34,15 +34,6 @@ function FriendReq() {
           orderByChild("uid"),
           equalTo(item.val().sender_uid)
         );
-        // onValue(fetchUserQuery, (snapShot) => {
-        //   snapShot.forEach((user) => {
-        //     friendReqList.push({
-        //       ...user.val(),
-        //       reqKey: item.key,
-        //       sentItAt: item.val().createdAt,
-        //     });
-        //   });
-        // });
         get(fetchUserQuery).then((snapShot) => {
           snapShot.forEach((user) => {
             friendReqList.push({

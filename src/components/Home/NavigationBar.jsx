@@ -10,7 +10,7 @@ import { NavLink } from "react-router-dom";
 import { Uploader } from "uploader"; // Installed by "react-uploader".
 import { UploadButton } from "react-uploader";
 import { MdOutlineCloudUpload } from "react-icons/md";
-import { getAuth } from "firebase/auth";
+import { getAuth, updateProfile } from "firebase/auth";
 import appDB from "../../FirebaseConfig/FireBaseDBConnection";
 import { getDatabase, ref, set, onValue, update } from "firebase/database";
 import { ErrorToast, SuccesfullToast } from "../../Utils/toast";
@@ -43,20 +43,15 @@ function NavigationBar() {
     const starCountRef = ref(db, "users/");
     onValue(starCountRef, (snapshot) => {
       snapshot.forEach((item) => {
-        // console.log(item.key);
-
         if (userId == item.val().uid) {
           setuserList({
             ...item.val(),
             userKey: item.key,
           });
-          // console.log(item.key, item.val());
         }
       });
     });
   }, [location, auth?.currentUser?.uid]);
-
-  // console.log(userList);
 
   return (
     <div className="bg-cs-purple  w-[186px] h-full  py-6 rounded-xl overflow-hidden">
@@ -65,27 +60,33 @@ function NavigationBar() {
           <picture className="">
             <img
               src={
-                userList.userProfilePic
-                  ? userList.userProfilePic
+                auth.currentUser?.photoURL
+                  ? auth.currentUser?.photoURL
                   : userProfileImg
               }
               alt={userProfileImg}
               className="w-24 h-24 rounded-full"
             />
+            P
           </picture>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover/upload:bg-black/45 group-hover/upload:rounded-full w-full h-full  items-center justify-center group-hover/upload:flex hidden text-white text-2xl duration-500 ease-in-out ring ring-white/70 ">
             <UploadButton
               uploader={uploader}
               options={options}
               onComplete={(files) => {
-                console.log(files);
-
-                update(ref(db, `users/${userList.userKey}`), {
-                  userProfilePic: files[0].fileUrl,
+                updateProfile(auth.currentUser, {
+                  photoURL: files[0].fileUrl,
                 })
                   .then(() => {
-                    SuccesfullToast("Profile Update done", "top-left");
-                    console.log("Profile Update done", files[0].fileUrl);
+                    update(ref(db, `users/${userList.userKey}`), {
+                      userProfilePic: files[0].fileUrl,
+                    })
+                      .then(() => {
+                        SuccesfullToast("Profile Update done", "top-left");
+                      })
+                      .catch((err) => {
+                        ErrorToast(`${err.code}`);
+                      });
                   })
                   .catch((err) => {
                     ErrorToast(`${err.code}`);
@@ -99,6 +100,7 @@ function NavigationBar() {
               )}
             </UploadButton>
           </div>
+          <p className="text-center">{auth.currentUser.displayName}</p>
         </div>
         <div className="text-white/70  flex flex-col gap-16 ">
           <NavLink to={"/"}>

@@ -13,7 +13,16 @@ import { ErrorToast, SuccesfullToast } from "../../Utils/toast";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
-import { getDatabase, push, ref, set } from "firebase/database";
+import {
+  equalTo,
+  get,
+  getDatabase,
+  orderByChild,
+  push,
+  query,
+  ref,
+  set,
+} from "firebase/database";
 import { GetTimeNow } from "../../Utils/moment";
 import appDB from "../../FirebaseConfig/FireBaseDBConnection";
 
@@ -28,10 +37,9 @@ function LoginLeft() {
     emailError: "",
     passwordError: "",
   });
-
+  const [isUserExist, setIsUserExist] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
   const auth = getAuth(appDB);
   const db = getDatabase();
 
@@ -53,17 +61,17 @@ function LoginLeft() {
   const handleOnSubmit = (e) => {
     e.preventDefault();
 
-    if (!email) {
+    if (!userInfo.email) {
       setErr({
         ...err,
         emailError: "Email required",
       });
-    } else if (emailValidation(email)) {
+    } else if (emailValidation(userInfo.email)) {
       setErr({
         ...err,
         emailError: "Email is not valid",
       });
-    } else if (!password) {
+    } else if (!userInfo.password) {
       setErr({
         ...err,
         passwordError: "Password required",
@@ -78,23 +86,7 @@ function LoginLeft() {
         .then((userCredential) => {
           const user = userCredential.user;
           SuccesfullToast("logged in");
-          console.log(user);
         })
-        // .then((user) => {
-        //   const { photoUrl, localId, email, displayName } = user.reloadUserInfo;
-        //   // console.log(user);
-        //   const usersRef = ref(db, "users");
-        //   set(
-        //     push(usersRef, {
-        //       uid: localId,
-        //       username: user,
-        //       userProfilePic: photoUrl,
-        //       userEmail: email,
-        //       createdAt: GetTimeNow(),
-        //     })
-        //   );
-        //   navigate("/");
-        // })
         .then(() => {
           navigate("/");
         })
@@ -129,18 +121,43 @@ function LoginLeft() {
           SuccesfullToast("Logged in with Google");
           return user;
         })
+        .then(async (user) => {
+          console.log(user.reloadUserInfo);
+
+          const { email } = user?.reloadUserInfo;
+
+          console.log(email);
+
+          const existeduser = query(
+            ref(db, "users/"),
+            orderByChild("email"),
+            equalTo(email)
+          );
+
+          const snapShot = await get(existeduser);
+
+          if (snapShot.exists()) {
+            setIsUserExist(Object.values(snapShot?.val())[0]?.email == email);
+            return;
+          }
+
+          if (!isUserExist) {
+            console.log(isUserExist);
+
+            const { photoUrl, localId, email, displayName } =
+              user.reloadUserInfo;
+
+            const usersRef = ref(db, "users");
+            set(push(usersRef), {
+              uid: localId,
+              username: displayName,
+              userProfilePic: photoUrl,
+              email: email,
+              createdAt: GetTimeNow(),
+            });
+          }
+        })
         .then((user) => {
-          console.log(user);
-          const { photoUrl, localId, email, displayName } = user.reloadUserInfo;
-          // console.log(user);
-          const usersRef = ref(db, "users");
-          set(push(usersRef), {
-            uid: localId,
-            username: displayName,
-            userProfilePic: photoUrl,
-            userEmail: email,
-            createdAt: GetTimeNow(),
-          });
           navigate("/");
         })
         .catch((error) => {

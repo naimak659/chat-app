@@ -29,8 +29,6 @@ function NavigationSideBar() {
     });
   }, []);
 
-  console.log(isverified);
-
   return (
     <>
       <div className="px-8 py-9 h-screen flex gap-4 ">
