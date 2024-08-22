@@ -8,15 +8,69 @@ import {
   getDatabase,
   onValue,
   orderByChild,
+  push,
   query,
   ref,
+  remove,
+  set,
 } from "firebase/database";
 import moment from "moment";
+import { CiSquareMore } from "react-icons/ci";
+import { ErrorToast, SuccesfullToast } from "../../../../Utils/toast";
+import { GetTimeNow } from "../../../../Utils/moment";
 
 function Friend() {
   const auth = getAuth();
   const db = getDatabase();
   const [friendList, setFriendList] = useState([]);
+  const [activePopupIndex, setActivePopupIndex] = useState(null);
+
+  const handleUnfriend = (data) => {
+    const uid1 = data.uid1;
+    const uid2 = data.uid2;
+
+    remove(ref(db, `friend/${uid1}_${uid2}`))
+      .then(() => {
+        remove(ref(db, `friend/${uid2}_${uid1}`));
+      })
+      .then(() => {
+        SuccesfullToast("unfriend successfully 🧐!");
+      })
+      .catch((err) => {
+        console.log(err);
+        ErrorToast("something is wrong");
+      });
+  };
+
+  const handleBlock = (data) => {
+    const uid1 = data.uid1;
+    const uid2 = data.uid2;
+    const friendshipKey = uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
+
+    const blockRef = ref(db, "block/" + friendshipKey);
+    set(blockRef, {
+      uid1,
+      uid2,
+      createdAt: GetTimeNow(),
+    })
+      .then(() => {
+        remove(ref(db, `friend/${uid1}_${uid2}`))
+          .then(() => {
+            remove(ref(db, `friend/${uid2}_${uid1}`));
+          })
+          .then(() => {
+            SuccesfullToast("blocked successfully 🧐!");
+          })
+          .catch((err) => {
+            console.log(err);
+            ErrorToast("something is wrong");
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+        ErrorToast("something is wrong when block user 🤷‍♂️");
+      });
+  };
 
   useEffect(() => {
     const friendQuery = query(
@@ -36,6 +90,7 @@ function Friend() {
         get(fetchUserQuery).then((snapShot) => {
           snapShot.forEach((user) => {
             friendBlankList.push({
+              ...friendList,
               ...user.val(),
               friendRefKey: item.key,
               uid1: item.val().uid1,
@@ -64,11 +119,11 @@ function Friend() {
           </p>
           <IoMdMore className="text-xl text-cs-purple" />
         </div>
-        <div className="overflow-y-scroll scrollbar-thumb-rounded-full scrollbar-thin max-h-[312px] px-2 ">
+        <div className="overflow-y-scroll scrollbar-thumb-rounded-full scrollbar-thin max-h-[312px] px-2 py-2">
           {friendList.map((item, i) => {
             return (
               <div key={i}>
-                <div className="flex  mb-3 justify-between items-center">
+                <div className="flex mb-3 justify-between items-center">
                   <div className="flex items-center gap-4 rounded-full">
                     <picture>
                       <img
@@ -90,7 +145,37 @@ function Friend() {
                       </p>
                     </div>
                   </div>
-                  <div></div>
+                  <div className="relative ">
+                    <button
+                      className="text-cs-purple cursor-pointer font-bold 2xl:text-3xl font-poppins text-sm "
+                      onClick={() =>
+                        setActivePopupIndex(activePopupIndex === i ? null : i)
+                      }
+                    >
+                      <CiSquareMore />
+                    </button>
+                    <div
+                      className={`bg-white shadow-xl rounded-xl absolute duration-300 ${
+                        activePopupIndex === i
+                          ? "-top-5 right-8 scale-100"
+                          : "scale-0  -top-6 -right-9"
+                      }`}
+                    >
+                      <div
+                        className=" hover:bg-cs-purple hover:text-white w-full px-3 py-2 rounded-tl-xl rounded-tr-xl duration-200"
+                        onClick={() => handleUnfriend(item)}
+                      >
+                        Unfriend
+                      </div>
+                      <hr />
+                      <div
+                        className=" hover:bg-cs-purple hover:text-white w-full px-3 py-2 rounded-bl-xl rounded-br-xl duration-200"
+                        onClick={() => handleBlock(item)}
+                      >
+                        Block
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <hr className="mb-2" key={i + 20} />
               </div>

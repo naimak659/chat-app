@@ -19,8 +19,7 @@ import { IoPersonAddOutline } from "react-icons/io5";
 import moment from "moment";
 import { GetTimeNow } from "../../../../Utils/moment.js";
 import { ErrorToast, SuccesfullToast } from "../../../../Utils/toast.js";
-import { FireDb } from "../../../../FirebaseConfig/FireBaseDBConnection.js";
-import { addDoc, collection } from "firebase/firestore";
+
 function FriendReq() {
   const auth = getAuth();
   const db = getDatabase();
@@ -69,22 +68,22 @@ function FriendReq() {
       )
       .then(() => {
         remove(ref(db, `friendreq/${data.reqKey}`));
-        SuccesfullToast(`${data.name} is added to your friend list`);
+        SuccesfullToast(`${data.username} is added to your friend list 🎉`);
       })
       .catch((err) => {
         console.log(err);
-        ErrorToast("something is wrong");
+        ErrorToast("something is wrong 🤷‍♂️");
       });
   };
 
   function handleCancleFriendReq(data) {
     remove(ref(db, `friendreq/${data.reqKey}`))
       .then(() => {
-        SuccesfullToast("request cancled");
+        SuccesfullToast("request cancled 😥");
       })
       .catch((err) => {
         console.log(err);
-        ErrorToast("something is wrong");
+        ErrorToast("something is wrong 🤷‍♂️");
       });
   }
 
@@ -100,14 +99,6 @@ function FriendReq() {
             </span>
           </span>
         </p>
-        <button
-          className="text-white z-50 bg-cs-purple p-1"
-          onClick={() => {
-            fireStoneCheck();
-          }}
-        >
-          fireStore
-        </button>
         <IoMdMore className="text-xl text-cs-purple" />
       </div>
       <div className="overflow-y-scroll scrollbar-thumb-rounded-full scrollbar-thin max-h-[312px] px-2 ">

@@ -74,8 +74,6 @@ function UserList() {
     };
   }, [db, auth.currentUser.uid]);
 
-  // console.log("friendReqList user", friendReqList.length, friendReqList);
-
   /**
    * todo: get all users from firebase
    */
