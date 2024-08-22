@@ -78,20 +78,46 @@ function UserList() {
    * todo: get all users from firebase
    */
   useEffect(() => {
-    const userDbRef = ref(db, "users/");
-    onValue(userDbRef, (snapshot) => {
-      let userBlankArr = [];
-      snapshot.forEach((item) => {
-        if (item.val().uid !== auth.currentUser.uid) {
-          userBlankArr.push({
-            ...item.val(),
-            userKey: item.key,
-          });
-        }
+    const fetchUsers = () => {
+      const userDbRef = ref(db, "users/");
+      onValue(userDbRef, (snapshot) => {
+        let userBlankArr = [];
+
+        snapshot.forEach((item) => {
+          if (item.val().uid !== auth.currentUser.uid) {
+            const blockListRef = ref(
+              db,
+              `block/${auth.currentUser.uid}_${item.val().uid}`
+            );
+            const friendListRef = ref(
+              db,
+              `friend/${auth.currentUser.uid}_${item.val().uid}`
+            );
+
+            // Check blocklist status for each user
+            onValue(blockListRef, (blockSnapShot) => {
+              if (!blockSnapShot.exists()) {
+                onValue(friendListRef, (friendSnapShot) => {
+                  if (!friendSnapShot.exists()) {
+                    userBlankArr.push({
+                      ...item.val(),
+                      userKey: item.key,
+                    });
+                    setusers([...userBlankArr]);
+                  }
+                }); // Update state after each valid user is found
+              }
+            }); // Ensure the listener is removed after one call
+          }
+        });
       });
-      setusers(userBlankArr);
-    });
-    // console.log(auth.currentUser);
+    };
+
+    fetchUsers();
+
+    return () => {
+      // Clean up if necessary
+    };
   }, []);
 
   return (
