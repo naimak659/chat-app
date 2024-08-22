@@ -87,7 +87,7 @@ function RegisterLeft() {
             });
         })
         .then(() => {
-          const usersRef = ref(db, "users");
+          const usersRef = ref(db, `users/${auth.currentUser.uid}`);
           set(push(usersRef), {
             uid: auth.currentUser.uid,
             username: fullname,

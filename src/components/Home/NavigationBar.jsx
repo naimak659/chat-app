@@ -67,7 +67,6 @@ function NavigationBar() {
               alt={userProfileImg}
               className="w-24 h-24 rounded-full"
             />
-            P
           </picture>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover/upload:bg-black/45 group-hover/upload:rounded-full w-full h-full  items-center justify-center group-hover/upload:flex hidden text-white text-2xl duration-500 ease-in-out ring ring-white/70 ">
             <UploadButton

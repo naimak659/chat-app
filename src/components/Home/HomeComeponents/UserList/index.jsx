@@ -26,23 +26,16 @@ function UserList() {
   const [friendReqList, setFriendReqList] = useState([]);
 
   const handleFriendReq = (user) => {
-    const friendReqDbRef = ref(db, "friendreq/");
+    const friendRequestKey =
+      auth.currentUser.uid < user.uid
+        ? `${auth.currentUser.uid}_${user.uid}`
+        : `${user.uid}_${auth.currentUser.uid}`;
+    const friendReqDbRef = ref(db, `friendreq/${friendRequestKey}`);
 
-    set(push(friendReqDbRef), {
+    set(friendReqDbRef, {
       sender_uid: auth.currentUser.uid,
-      // sender_userKey: auth.currentUser.userKey,
-      sender_email: auth.currentUser.email,
-      sender_name: auth.currentUser.displayName,
-      sender_userProfilePic: auth.currentUser.photoURL
-        ? auth.currentUser.photoURL
-        : null,
       receiver_uid: user.uid,
-      receiver_email: user.email,
-      receiver_name: user.username,
-      receiver_userKey: user.userKey,
-      receiver_userProfilePic: user.userProfilePic,
       createdAt: GetTimeNow(),
-      status: "pending",
     });
   };
 
@@ -81,7 +74,7 @@ function UserList() {
     };
   }, [db, auth.currentUser.uid]);
 
-  console.log("friendReqList user", friendReqList.length, friendReqList);
+  // console.log("friendReqList user", friendReqList.length, friendReqList);
 
   /**
    * todo: get all users from firebase

@@ -3,6 +3,7 @@ import Search from "../HomeComeponents/Search";
 import Group from "../HomeComeponents/GroupList/Group";
 import UserList from "../HomeComeponents/UserList/index.jsx";
 import FriendReq from "../HomeComeponents/FriendReq/FriendReq.jsx";
+import Friend from "../HomeComeponents/Friend/Friend.jsx";
 
 function HomeRight() {
   return (
@@ -13,10 +14,9 @@ function HomeRight() {
         <UserList />
         <FriendReq />
       </div>
-      {/* <div className="flex flex-col gap-2">
-        <Group />
-        <Group />
-      </div> */}
+      <div className="flex flex-col gap-2">
+        <Friend />
+      </div>
     </div>
   );
 }

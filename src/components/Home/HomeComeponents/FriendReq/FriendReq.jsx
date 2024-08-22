@@ -10,10 +10,15 @@ import {
   orderByChild,
   equalTo,
   get,
+  set,
+  push,
+  remove,
 } from "firebase/database";
 import { MdOutlineCancel } from "react-icons/md";
 import { IoPersonAddOutline } from "react-icons/io5";
 import moment from "moment";
+import { GetTimeNow } from "../../../../Utils/moment.js";
+import { ErrorToast, SuccesfullToast } from "../../../../Utils/toast.js";
 
 function FriendReq() {
   const auth = getAuth();
@@ -40,6 +45,8 @@ function FriendReq() {
               ...user.val(),
               reqKey: item.key,
               sentItAt: item.val().createdAt,
+              receiver_uid: item.val().receiver_uid,
+              sender_uid: item.val().sender_uid,
             });
           });
         });
@@ -47,7 +54,32 @@ function FriendReq() {
       setFriendReqList(friendReqList);
     });
   }, []);
-  console.log(friendReqList);
+
+  const handleAddFriendDB = (data) => {
+    const uid1 = data.sender_uid;
+    const uid2 = data.receiver_uid;
+    // const friendshipKey = uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
+    const friendDbRef1 = ref(db, `friend/${uid1}_${uid2}`);
+    const friendDbRef2 = ref(db, `friend/${uid2}_${uid1}`);
+
+    set(friendDbRef1, { uid1, uid2, createdAt: GetTimeNow() })
+      .then(() =>
+        set(friendDbRef2, { uid1: uid2, uid2: uid1, createdAt: GetTimeNow() })
+      )
+      .then(() => {
+        remove(ref(db, `friendreq/${data.reqKey}`));
+        SuccesfullToast(`${data.name} is added to your friend list`);
+      })
+      .catch((err) => {
+        console.log(err);
+        ErrorToast("something is wrong");
+      });
+  };
+
+  const handleCancleFriendReq = (data) => {
+    remove(ref(db, `friendreq/${data.reqKey}`));
+  };
+  console.log(auth.currentUser.uid);
 
   return (
     <div className="shadow-lg py-4 px-5 rounded-lg 2xl:w-full  scrollbar-thumb-cs-purple/80 scrollbar-track-cs-purple/40 scrollbar-thumb-r font-poppins">
@@ -91,11 +123,16 @@ function FriendReq() {
                 <div className="flex gap-2">
                   <button
                     className="bg-cs-purple 2xl:px-5 2xl:py-2 rounded-xl text-white 2xl:text-lg font-semibold font-poppins text-sm px-3 py-1"
-                    onClick={() => {}}
+                    onClick={() => {
+                      handleAddFriendDB(item);
+                    }}
                   >
                     <IoPersonAddOutline />
                   </button>
-                  <button className="bg-cs-purple 2xl:px-5 2xl:py-2 rounded-xl text-white 2xl:text-lg font-semibold font-poppins text-sm px-3 py-1">
+                  <button
+                    onClick={() => handleCancleFriendReq(item)}
+                    className="bg-cs-purple 2xl:px-5 2xl:py-2 rounded-xl text-white 2xl:text-lg font-semibold font-poppins text-sm px-3 py-1"
+                  >
                     <MdOutlineCancel />
                   </button>
                 </div>
