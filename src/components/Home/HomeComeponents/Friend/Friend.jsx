@@ -45,12 +45,12 @@ function Friend() {
   const handleBlock = (data) => {
     const uid1 = data.uid1;
     const uid2 = data.uid2;
-    const friendDbRef1 = ref(db, `friend/${uid1}_${uid2}`);
-    const friendDbRef2 = ref(db, `friend/${uid2}_${uid1}`);
+    const blockDbRef1 = ref(db, `block/${uid1}_${uid2}`);
+    const blockDbRef2 = ref(db, `block/${uid2}_${uid1}`);
 
-    set(friendDbRef1, { uid1, uid2, createdAt: GetTimeNow() })
+    set(blockDbRef1, { uid1, uid2, createdAt: GetTimeNow() })
       .then(() => {
-        set(friendDbRef2, { uid1: uid2, uid2: uid1, createdAt: GetTimeNow() });
+        set(blockDbRef2, { uid1: uid2, uid2: uid1, createdAt: GetTimeNow() });
       })
       .then(() => {
         remove(ref(db, `friend/${uid1}_${uid2}`))
