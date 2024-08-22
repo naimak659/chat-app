@@ -19,7 +19,8 @@ import { IoPersonAddOutline } from "react-icons/io5";
 import moment from "moment";
 import { GetTimeNow } from "../../../../Utils/moment.js";
 import { ErrorToast, SuccesfullToast } from "../../../../Utils/toast.js";
-
+import { FireDb } from "../../../../FirebaseConfig/FireBaseDBConnection.js";
+import { addDoc, collection } from "firebase/firestore";
 function FriendReq() {
   const auth = getAuth();
   const db = getDatabase();
@@ -76,13 +77,19 @@ function FriendReq() {
       });
   };
 
-  const handleCancleFriendReq = (data) => {
-    remove(ref(db, `friendreq/${data.reqKey}`));
-  };
-  console.log(auth.currentUser.uid);
+  function handleCancleFriendReq(data) {
+    remove(ref(db, `friendreq/${data.reqKey}`))
+      .then(() => {
+        SuccesfullToast("request cancled");
+      })
+      .catch((err) => {
+        console.log(err);
+        ErrorToast("something is wrong");
+      });
+  }
 
   return (
-    <div className="shadow-lg py-4 px-5 rounded-lg 2xl:w-full  scrollbar-thumb-cs-purple/80 scrollbar-track-cs-purple/40 scrollbar-thumb-r font-poppins">
+    <div className="shadow-lg py-4 px-5 rounded-lg 2xl:w-full  scrollbar-thumb-cs-purple/80 scrollbar-track-cs-purple/40 scrollbar-thumb-r font-poppins max-h-[87%]">
       <div className="flex justify-between mb-4">
         <p className="text-xl font-semibold relative">
           <span>Friend Request</span>
@@ -93,7 +100,14 @@ function FriendReq() {
             </span>
           </span>
         </p>
-
+        <button
+          className="text-white z-50 bg-cs-purple p-1"
+          onClick={() => {
+            fireStoneCheck();
+          }}
+        >
+          fireStore
+        </button>
         <IoMdMore className="text-xl text-cs-purple" />
       </div>
       <div className="overflow-y-scroll scrollbar-thumb-rounded-full scrollbar-thin max-h-[312px] px-2 ">
@@ -130,7 +144,9 @@ function FriendReq() {
                     <IoPersonAddOutline />
                   </button>
                   <button
-                    onClick={() => handleCancleFriendReq(item)}
+                    onClick={() => {
+                      handleCancleFriendReq(item);
+                    }}
                     className="bg-cs-purple 2xl:px-5 2xl:py-2 rounded-xl text-white 2xl:text-lg font-semibold font-poppins text-sm px-3 py-1"
                   >
                     <MdOutlineCancel />

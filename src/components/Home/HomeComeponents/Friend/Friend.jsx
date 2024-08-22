@@ -58,7 +58,7 @@ function Friend() {
             <span className="absolute -top-1 -right-[16px] flex h-4 w-4">
               <span className="animate-ping animate-infinite animate-duration-1000 animate-ease-in-out absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-4 w-4 bg-sky-500 text-xs text-white justify-center items-center ">
-                {/* {users.length} */}1
+                {friendList.length}
               </span>
             </span>
           </p>

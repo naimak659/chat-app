@@ -8,13 +8,15 @@ import Friend from "../HomeComeponents/Friend/Friend.jsx";
 function HomeRight() {
   return (
     <div className="grid grid-cols-3 gap-6 w-full">
-      <div className="flex flex-col gap-2">
+      <div>
         <Search />
-        {/* <Group /> */}
-        <UserList />
-        <FriendReq />
+        <div className="grid grid-rows-2 gap-2 h-full">
+          {/* <Group /> */}
+          <UserList />
+          <FriendReq />
+        </div>
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="grid grid-rows-2 gap-2 ">
         <Friend />
       </div>
     </div>
