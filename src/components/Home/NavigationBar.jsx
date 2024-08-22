@@ -38,6 +38,12 @@ function NavigationBar() {
       },
     },
   };
+
+  const handleSignOut = (auth) => {
+    auth.signOut();
+    SuccesfullToast("Logout Successfully");
+  };
+
   useEffect(() => {
     const userId = auth?.currentUser?.uid;
     const starCountRef = ref(db, "users/");
@@ -160,7 +166,7 @@ function NavigationBar() {
           </NavLink>
         </div>
 
-        <div className="mt-10">
+        <div className="mt-10" onClick={() => handleSignOut(auth)}>
           <HiOutlineLogout className="text-[44px] text-white/70" />
         </div>
       </div>
