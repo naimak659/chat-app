@@ -87,12 +87,12 @@ function RegisterLeft() {
             });
         })
         .then(() => {
-          const usersRef = ref(db, `users/${auth.currentUser.uid}`);
-          set(push(usersRef), {
+          const usersRef = ref(db, `users/${fullname}`);
+          set(usersRef, {
             uid: auth.currentUser.uid,
             username: fullname,
             userProfilePic: "",
-            userEmail: auth.currentUser.email,
+            email: auth.currentUser.email,
             createdAt: GetTimeNow(),
           })
             .then(() => {

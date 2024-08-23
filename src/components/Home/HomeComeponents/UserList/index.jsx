@@ -85,15 +85,15 @@ function UserList() {
 
         snapshot.forEach((item) => {
           if (item.val().uid !== auth.currentUser.uid) {
-            const blockListRef = ref(
-              db,
-              `block/${auth.currentUser.uid}_${item.val().uid}`
-            );
+            const uidJoin =
+              auth.currentUser.uid < item.val().uid
+                ? `${auth.currentUser.uid}_${item.val().uid}`
+                : `${item.val().uid}_${auth.currentUser.uid}`;
+            const blockListRef = ref(db, `block/${uidJoin}`);
             const friendListRef = ref(
               db,
               `friend/${auth.currentUser.uid}_${item.val().uid}`
             );
-
             // Check blocklist status for each user
             onValue(blockListRef, (blockSnapShot) => {
               if (!blockSnapShot.exists()) {
@@ -134,7 +134,7 @@ function UserList() {
         </p>
         <IoMdMore className="text-xl text-cs-purple" />
       </div>
-      <div className="overflow-y-scroll scrollbar-thumb-rounded-full scrollbar-thin max-h-[312px] px-2 ">
+      <div className="overflow-y-scroll scrollbar-thumb-rounded-full scrollbar-thin max-h-[312px]  px-2 ">
         {users.map((item, i) => {
           return (
             <div key={item.uid + i}>

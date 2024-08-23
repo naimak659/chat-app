@@ -18,6 +18,7 @@ import moment from "moment";
 import { CiSquareMore } from "react-icons/ci";
 import { ErrorToast, SuccesfullToast } from "../../../../Utils/toast";
 import { GetTimeNow } from "../../../../Utils/moment";
+import { ImBlocked } from "react-icons/im";
 
 function Friend() {
   const auth = getAuth();
@@ -43,15 +44,16 @@ function Friend() {
   };
 
   const handleBlock = (data) => {
-    const uid1 = data.uid1;
+    const uid1 = auth.currentUser.uid;
     const uid2 = data.uid2;
-    const blockDbRef1 = ref(db, `block/${uid1}_${uid2}`);
-    const blockDbRef2 = ref(db, `block/${uid2}_${uid1}`);
+    const uidJoin = uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
+    const blockDbRef1 = ref(db, `block/${uidJoin}`);
 
-    set(blockDbRef1, { uid1, uid2, createdAt: GetTimeNow() })
-      .then(() => {
-        set(blockDbRef2, { uid1: uid2, uid2: uid1, createdAt: GetTimeNow() });
-      })
+    set(blockDbRef1, {
+      blockedBy: uid1,
+      blockedPerson: uid2,
+      createdAt: GetTimeNow(),
+    })
       .then(() => {
         remove(ref(db, `friend/${uid1}_${uid2}`))
           .then(() => {
@@ -106,7 +108,7 @@ function Friend() {
   return (
     <>
       <div className="shadow-lg py-4 px-5 rounded-lg 2xl:w-full  scrollbar-thumb-cs-purple/80 scrollbar-track-cs-purple/40 scrollbar-thumb-r font-poppins">
-        <div className="flex justify-between mb-4">
+        <div className="flex justify-between pb-4">
           <p className="text-xl font-semibold relative">
             <span>Friend</span>
             <span className="absolute -top-1 -right-[16px] flex h-4 w-4">
@@ -118,10 +120,10 @@ function Friend() {
           </p>
           <IoMdMore className="text-xl text-cs-purple" />
         </div>
-        <div className="overflow-y-scroll scrollbar-thumb-rounded-full scrollbar-thin max-h-[312px] px-2 py-2">
+        <div className="overflow-y-scroll scrollbar-thumb-rounded-full scrollbar-thin max-h-[312px] px-2 z-50 py-2">
           {friendList.map((item, i) => {
             return (
-              <div key={i}>
+              <div key={i} className="z-50">
                 <div className="flex mb-3 justify-between items-center">
                   <div className="flex items-center gap-4 rounded-full">
                     <picture>
@@ -146,7 +148,7 @@ function Friend() {
                   </div>
                   <div className="relative ">
                     <button
-                      className="text-cs-purple cursor-pointer font-bold 2xl:text-3xl font-poppins text-sm "
+                      className="text-cs-purple cursor-pointer font-bold 2xl:text-3xl font-poppins text-3xl"
                       onClick={() =>
                         setActivePopupIndex(activePopupIndex === i ? null : i)
                       }
@@ -156,21 +158,22 @@ function Friend() {
                     <div
                       className={`bg-white shadow-xl rounded-xl absolute duration-300 ${
                         activePopupIndex === i
-                          ? "-top-5 right-8 scale-100"
+                          ? "-top-2 right-8 scale-100"
                           : "scale-0  -top-6 -right-9"
                       }`}
                     >
                       <div
-                        className=" hover:bg-cs-purple hover:text-white w-full px-3 py-2 rounded-tl-xl rounded-tr-xl duration-200"
+                        className=" hover:bg-cs-purple hover:text-white w-full px-3 py-1 rounded-tl-xl rounded-tr-xl duration-200 text-sm"
                         onClick={() => handleUnfriend(item)}
                       >
                         Unfriend
                       </div>
                       <hr />
                       <div
-                        className=" hover:bg-cs-purple hover:text-white w-full px-3 py-2 rounded-bl-xl rounded-br-xl duration-200"
+                        className=" hover:bg-cs-purple hover:text-white w-full flex items-center gap-1  px-3 py-1 rounded-bl-xl rounded-br-xl duration-200 text-sm"
                         onClick={() => handleBlock(item)}
                       >
+                        <ImBlocked />
                         Block
                       </div>
                     </div>

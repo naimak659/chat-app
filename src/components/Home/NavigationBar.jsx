@@ -11,8 +11,16 @@ import { Uploader } from "uploader"; // Installed by "react-uploader".
 import { UploadButton } from "react-uploader";
 import { MdOutlineCloudUpload } from "react-icons/md";
 import { getAuth, updateProfile } from "firebase/auth";
-import appDB from "../../FirebaseConfig/FireBaseDBConnection";
-import { getDatabase, ref, set, onValue, update } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  set,
+  onValue,
+  update,
+  query,
+  orderByChild,
+  equalTo,
+} from "firebase/database";
 import { ErrorToast, SuccesfullToast } from "../../Utils/toast";
 
 function NavigationBar() {
@@ -20,6 +28,7 @@ function NavigationBar() {
   const [userProfileImg, setuserProfileImg] = useState(ProfileImg1);
   const auth = getAuth();
   const db = getDatabase();
+
   const location = useLocation();
 
   const uploader = Uploader({
@@ -44,17 +53,37 @@ function NavigationBar() {
     SuccesfullToast("Logout Successfully");
   };
 
+  const handleImgUpload = (files) => {
+    updateProfile(auth.currentUser, {
+      photoURL: files[0].fileUrl,
+    })
+      .then(() => {
+        update(ref(db, `users/${userList.userKey}`), {
+          userProfilePic: files[0].fileUrl,
+        })
+          .then(() => {
+            SuccesfullToast("Profile Update done", "top-left");
+          })
+          .catch((err) => {
+            ErrorToast(`${err.code}`);
+          });
+      })
+      .catch((err) => {
+        ErrorToast(`${err.code}`);
+      });
+  };
+
   useEffect(() => {
     const userId = auth?.currentUser?.uid;
-    const starCountRef = ref(db, "users/");
-    onValue(starCountRef, (snapshot) => {
-      snapshot.forEach((item) => {
-        if (userId == item.val().uid) {
-          setuserList({
-            ...item.val(),
-            userKey: item.key,
-          });
-        }
+    const userQuery = query(
+      ref(db, "users/"),
+      orderByChild("uid"),
+      equalTo(userId)
+    );
+    onValue(userQuery, (snapShot) => {
+      snapShot.forEach((item) => {
+        setuserList(item.val());
+        setuserProfileImg(item.val().userProfilePic);
       });
     });
   }, [location, auth?.currentUser?.uid]);
@@ -78,25 +107,7 @@ function NavigationBar() {
             <UploadButton
               uploader={uploader}
               options={options}
-              onComplete={(files) => {
-                updateProfile(auth.currentUser, {
-                  photoURL: files[0].fileUrl,
-                })
-                  .then(() => {
-                    update(ref(db, `users/${userList.userKey}`), {
-                      userProfilePic: files[0].fileUrl,
-                    })
-                      .then(() => {
-                        SuccesfullToast("Profile Update done", "top-left");
-                      })
-                      .catch((err) => {
-                        ErrorToast(`${err.code}`);
-                      });
-                  })
-                  .catch((err) => {
-                    ErrorToast(`${err.code}`);
-                  });
-              }}
+              onComplete={(files) => handleImgUpload(files)}
             >
               {({ onClick }) => (
                 <button onClick={onClick}>

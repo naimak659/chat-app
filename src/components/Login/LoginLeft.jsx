@@ -66,11 +66,6 @@ function LoginLeft() {
         ...err,
         emailError: "Email required",
       });
-    } else if (emailValidation(userInfo.email)) {
-      setErr({
-        ...err,
-        emailError: "Email is not valid",
-      });
     } else if (!userInfo.password) {
       setErr({
         ...err,
@@ -147,8 +142,8 @@ function LoginLeft() {
             const { photoUrl, localId, email, displayName } =
               user.reloadUserInfo;
 
-            const usersRef = ref(db, "users");
-            set(push(usersRef), {
+            const usersRef = ref(db, "users/" + localId);
+            set(usersRef, {
               uid: localId,
               username: displayName,
               userProfilePic: photoUrl,
